@@ -1,4 +1,4 @@
-import imgui
+﻿import imgui
 from PIL import Image
 from imgui.integrations.glfw import GlfwRenderer
 import glfw
@@ -67,9 +67,30 @@ style = imgui.get_style()
 style.colors[imgui.COLOR_WINDOW_BACKGROUND] = (0.1, 0.5, 0.8, 1.0) 
 page = 0
 
-def Panel():
-	pass
-	
+def AlunoPanel():
+	imgui.text("Aluno")
+def ProfessorPanel():
+	with imgui.begin_table("table", 5):
+		imgui.table_next_row()
+		imgui.table_next_column()
+		imgui.text("Nome")
+
+		imgui.table_next_column()
+		imgui.text("Java")
+
+		imgui.table_next_column()
+		imgui.text('Progamação web')
+		imgui.table_next_row()
+		imgui.table_next_column()
+
+		imgui.text("João")
+		nota_1 = 0 
+		nota_2 = 0 
+		imgui.table_next_column()
+		imgui.input_int("##nota1", nota_1)
+		imgui.table_next_column()
+		imgui.input_int("##nota2", nota_2)
+
 def Login():
 	global text_input_value
 	global senha_value
@@ -95,9 +116,18 @@ def Login():
 	changed, senha_value = imgui.input_text("##senha", senha_value, 256, flags=imgui.INPUT_TEXT_PASSWORD)
 
     # Button example
-	if imgui.button("Click Me!"):
-		page = 1
+	if imgui.button("entrar"):
+		if text_input_value == "aluno" and senha_value == "1234":
+			page = 1
+		elif text_input_value == "professor" and senha_value == "1234":
+			page = 2
 
+io = imgui.get_io()
+
+new_font = io.fonts.add_font_from_file_ttf(
+    "arial.ttf", 20,
+)
+impl.refresh_font_texture()
 # Main application loop
 while not glfw.window_should_close(window):
 	glfw.poll_events()
@@ -112,10 +142,14 @@ while not glfw.window_should_close(window):
     # Create a new fullscreen window
 	imgui.begin("Fullscreen UI Window", flags=imgui.WINDOW_NO_TITLE_BAR | imgui.WINDOW_NO_RESIZE | imgui.WINDOW_NO_MOVE | imgui.WINDOW_NO_COLLAPSE)
 
+	imgui.push_font(new_font)
 	if page == 0:
 		Login()
 	elif page == 1:
-		Panel()
+		AlunoPanel()
+	elif page == 2:
+		ProfessorPanel()
+	imgui.pop_font()
 
     # End the UI window
 	imgui.end()
