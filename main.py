@@ -5,6 +5,12 @@ import sqlite3
 con = sqlite3.connect("database.db")
 cur = con.cursor()
 
+def validate_float_input(P):
+    if P == "" or P.replace('.', '', 1).isdigit():
+        return True
+    else:
+        return False
+
 class PageOne(tk.Frame):
     def __init__(self, parent, controller):
 
@@ -51,12 +57,58 @@ class PageOne(tk.Frame):
             print(res[0][1])
             controller.show_frame(PageTwo)
             
+class PageJava(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
 
+        res = cur.execute(f"select nome, nota from alunos inner join java on java.alun_id = alunos.id;")
+        res = res.fetchall()
+        vcmd = (parent.register(validate_float_input), '%P')
+
+        if len(res) > 0:
+            print(res)
+            names_frame = tk.Frame(self)
+            names_frame.pack(side="left")
+            label = tk.Label(names_frame, text="nome")
+            label.pack(pady=2, side=tk.TOP)
+            for al in res:
+                label = tk.Label(names_frame, text=al[0])
+                label.pack(pady=2, side=tk.TOP)
+				#print(res.fetchall())
+            #controller.show_frame(PageTwo)
+            names_frame = tk.Frame(self)
+            names_frame.pack(side="left")
+            label = tk.Label(names_frame, text="nota")
+            label.pack(pady=2, side=tk.TOP)
+            for al in res:
+                entry = tk.Entry(names_frame, validate='key', validatecommand=vcmd)
+                entry.pack()
+                entry.insert(0, al[1])
+                input_value = entry.get()
+
+                if input_value.strip():  # Check if the input is not empty or just whitespace
+                    try:
+                        float_val = float(input_value)
+                    except ValueError:
+                        print("Please enter a valid number.")
+                else:
+                    print("Input cannot be empty.")
+				#print(res.fetchall())
+
+class PageCpp(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
 
 class PageTwo(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
+        button = tk.Button(self, text="java", command=lambda: controller.show_frame(PageJava))
+        button.pack()
+        button = tk.Button(self, text="c++", command=lambda: controller.show_frame(PageCpp))
+        button.pack()
+
+        '''
         names_frame = tk.Frame(self)
         names_frame.pack(side="left")
         label = tk.Label(names_frame, text="")
@@ -83,6 +135,7 @@ class PageTwo(tk.Frame):
         entry.pack(side="top", padx=10)
         entry = tk.Entry(other, width=20)
         entry.pack(side="top", padx=10)
+'''
         '''
         # Create two rows (frames) and pack them vertically
         for row in range(2):
@@ -110,12 +163,12 @@ class App(tk.Tk):
         self.frames = {}
 
         # Iterate through page classes and initialize them
-        for F in (PageOne, PageTwo):
+        for F in (PageOne, PageTwo, PageJava, PageCpp):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(PageTwo)
+        self.show_frame(PageOne)
 
     def show_frame(self, page):
         frame = self.frames[page]
